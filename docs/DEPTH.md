@@ -27,6 +27,10 @@
 | TRAP-15 | ug与mg | 静默采信错误值 | 统一mg/L | `app/modules/m2_contract/rules.py` | `tests/test_contract.py::test_contract_unit` |
 | TRAP-19 | 多质控失败 | 静默采信错误值 | 明确优先级 | `app/modules/m6_release/rules.py` | `tests/test_release.py::test_release_priority` |
 | TRAP-26 | 陈旧复测 | 静默采信错误值 | 版本递增 | `app/modules/m7_retest/rules.py` | `tests/test_retest.py::test_retest_stale` |
+| TRAP-31 | 部分重复样覆盖整批放行 | 一组重复样通过即带过同批未覆盖样品 | 覆盖台账逐样品项标记SUPPORTED/PENDING，批次结论PENDING_EVIDENCE显式列待证范围 | `app/modules/m3_parallel/rules.py`、`app/modules/m6_release/rules.py` | `tests/test_coverage.py::test_release_carries_pending_not_silent_pass` |
+| TRAP-32 | 补样改写已发结果 | 补来的重复样重算整批、覆盖旧结论 | 证据按batch\|analyte\|id身份键限定，补样只改其样品项，其他结论不变 | `app/modules/m3_parallel/rules.py` | `tests/test_coverage.py::test_supplement_only_changes_its_scope` |
+| TRAP-33 | 重跑产生重复结论 | 每次运行追加重复批次/复测行 | 台账与放行按稳定身份键去重，存储按输入摘要复用同一记录并保留评审历史 | `app/modules/m6_release/rules.py`、`app/store.py` | `tests/test_coverage.py::test_rerun_same_input_no_duplicate_conclusions` |
+| TRAP-34 | 复测任务整批扩大 | 一项失败即对整批全部样品开复测 | M7按失败来源逐样品项生成RETEST/SUPPLEMENT，控制样失败只开控制样任务 | `app/modules/m7_retest/rules.py` | `tests/test_coverage.py::test_failed_duplicate_blocks_its_sample_only` |
 
 ## 对账规则
 

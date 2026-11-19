@@ -28,7 +28,7 @@ docker compose config --quiet
 
 ## 输入与输出
 
-CSV可用UTF-8或GB18030；上传保留字符串编号和物理行号。POST `/api/run` 接收 `text` 字段。`GET /api/runs` 查询历史，`POST /api/review` 接收 id、revision、decision。导出按钮下载唯一证据CSV，含运行摘要与隔离记录。
+CSV可用UTF-8或GB18030；上传保留字符串编号和物理行号。POST `/api/run` 接收 `text` 字段。`GET /api/runs` 查询历史，`POST /api/review` 接收 id、revision、decision。导出按钮下载唯一证据CSV，含运行摘要、批次放行结论及证据引用、逐样品项重复样覆盖台账（SUPPORTED/FAILED/REVIEW/PENDING）、复测与补平行任务、隔离记录。重复样只证明其配对样品；未覆盖样品项在批次结论中以PENDING_EVIDENCE显式列出，不被静默带过，补样只影响对应身份键的样品项。重跑同一输入复用同一批次记录，不产生重复结论。
 
 SQLite命名卷保存运行记录。重建演示数据可更换卷名后重启。无需外部网络数据。规则定义见 `docs/DATA-DICTIONARY.md`；边界和测试对应关系见 `docs/DEPTH.md`。
 

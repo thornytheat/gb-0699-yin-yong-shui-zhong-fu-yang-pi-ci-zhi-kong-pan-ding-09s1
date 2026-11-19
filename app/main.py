@@ -13,6 +13,16 @@ app=FastAPI(title='饮用水重复样与批次质控判定')
 app.mount("/static",StaticFiles(directory=Path(__file__).parent/"static"),name="static")
 templates=Jinja2Templates(directory=Path(__file__).parent/"templates")
 templates.env.filters["display_number"]=display_number
+def _join_text(value,sep="、"):
+    return sep.join(str(v) for v in value) if value else "—"
+def _cell_text(value):
+    if isinstance(value,dict):
+        return " ".join(f"{k}={v}" for k,v in value.items())
+    if isinstance(value,(list,tuple)):
+        return "；".join(_cell_text(v) if isinstance(v,(dict,list,tuple)) else str(v) for v in value) or "—"
+    return str(value)
+templates.env.filters["join_text"]=_join_text
+templates.env.filters["cell_text"]=_cell_text
 MODULES=['样品接收', '检测项契约', '平行样核对', '加标回收', '空白污染', '批次放行', '复测追踪']
 for n,slug in enumerate(['samples', 'contract', 'parallel', 'spikes', 'blanks', 'release', 'retest'],1):
     app.include_router(importlib.import_module(f"app.modules.m{n}_{slug}.handler").router)

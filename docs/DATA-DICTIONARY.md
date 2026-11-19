@@ -7,3 +7,18 @@ id保留前导零；batch+analyte+pair决定平行样配对。kind为sample、du
 同id最高version为生效复测，同版本重复隔离。放行优先级为空白污染、空白缺失、回收失败、加标异常、配对失败、限定值复核。每个批次每项必须有空白；受限值进入人工复核。失败检测批生成逐样复测任务和下一最低版本。
 
 复测采用batch+analyte+id作为身份键，在此身份内选择最高version；不同检测项允许复用同样品编号。
+
+## 重复样证据范围（覆盖台账）
+
+每组重复样只证明其配对号下的原样，不向同批其他样品外溢。M3为每个生效原样（sample）产出一条覆盖台账 `coverage`，身份键为 `batch|analyte|id`，状态取值：
+
+- SUPPORTED：存在配对重复样且平行判定PASS，`supported_by` 记录该重复样编号、行号与判定。
+- FAILED：配对重复样平行判定PAIR_FAIL，只阻断该样品项的放行。
+- REVIEW：原样或重复样为限定值，转人工复核。
+- PENDING：缺少配对重复样（reason=DUPLICATE_MISSING），该样品项尚无重复样证据。
+
+M6批次结论引用覆盖台账：质控无失败且仍有PENDING样品项时状态为 `PENDING_EVIDENCE`，不冒充PASS；该状态不硬阻断交付，允许复核通过先行放行，但 `pending_ids` 显式列出仍在等证据的样品。只有质控/复核失败（PAIR_FAIL、BLANK_FAIL等）才硬阻断。补样重跑只改写其身份键对应样品项的台账状态，其他样品项结论不变。
+
+M7复测任务按失败实际来源逐条生成并按身份键去重：PENDING生成 `SUPPLEMENT`（补平行）任务，FAILED/REVIEW生成 `RETEST`，空白与加标失败只生成对应控制样任务，不再整批扩大。重跑同一输入因身份键稳定且存储按摘要复用，不产生重复结论，历史评审记录保留。
+
+证据CSV新增 `release`（批次结论及证据引用范围）与 `coverage`（逐样品项证据状态）两类行。

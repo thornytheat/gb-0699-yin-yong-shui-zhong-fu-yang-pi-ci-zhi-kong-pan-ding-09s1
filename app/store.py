@@ -21,7 +21,7 @@ def get(ident):
     with connect() as db:
         row=db.execute("SELECT * FROM runs WHERE id=?",(ident,)).fetchone()
     if row is None: raise BusinessError("NOT_FOUND","批次不存在",404)
-    item=dict(row);item["result"]=json.loads(item["result"]);item["rule_version"]=item["result"].get("rule_version","2026.11.18.1")
+    item=dict(row);item["result"]=json.loads(item["result"]);item["rule_version"]=item["result"].get("rule_version","2026.11.19.1")
     return item
 
 def history():
